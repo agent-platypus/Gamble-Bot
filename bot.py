@@ -1,5 +1,5 @@
 import os
-
+#deez
 import discord
 from dotenv import load_dotenv
 
