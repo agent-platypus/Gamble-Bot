@@ -10,7 +10,7 @@ class Player:
     # Assume amount <= self.money
     # And amount > 0
     # Subtracts amount from money
-    def subtractMoney(amount: int):
-        pass
+    def subtractMoney(self, amount: int):
+        self.money = self.money - amount 
 
 #hi
