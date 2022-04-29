@@ -7,7 +7,9 @@ class Payout:
     def __init__(self):
         self.bets = None
 
-    # call player.bet() and use the bet returned to add it to bets
+    # call Bet.makeBet and use the bet returned to add it to bets
+    # if amount <= 0 or amount >= player.money
+    # return an error and don't add bet
     def addBet(player: Player, horse: Horse, amount: int):
         pass
 

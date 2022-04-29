@@ -8,7 +8,9 @@ class Bet:
         self.player = None
         self.money = None
         self.horse = None
-        
+
+    # Assume amount <= self.money
+    # And amount > 0   
     # call player.subtractMoney
     # then set fields to the given parameters
     # return self
