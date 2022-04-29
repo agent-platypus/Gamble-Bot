@@ -12,3 +12,5 @@ class Player:
     # Subtracts amount from money
     def subtractMoney(amount: int):
         pass
+
+#hi
