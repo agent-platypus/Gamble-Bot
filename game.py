@@ -13,5 +13,5 @@ class Bet:
     # choose a winner based on probabilities and return them
     # then call payout.payoutPlayers
     # then call leaderboard.sortLeaderboard
-    def startGame():
+    def startGame(self):
         pass
