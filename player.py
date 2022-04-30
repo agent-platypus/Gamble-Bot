@@ -1,11 +1,11 @@
 
 from horse import Horse
 
-
+INIT_MONEY = 100
 class Player:
     def __init__(self, name: str):
         self.name = name
-        self.money = 100
+        self.money = INIT_MONEY
     
     # Assume amount <= self.money
     # And amount > 0
