@@ -135,6 +135,31 @@ class TestPlayer(unittest.TestCase):
         horse2 = Horse('donkey', 0.5)
         self.payout.payoutPlayers(horse2)
         self.assertEqual(player.money, balanceAfterBet)
+    
+    def testPayoutPlayersTwoBetsOneWinner(self):
+        player = Player('jett')
+        horse = Horse('horsey', 0.5)
+        betAmount = INIT_MONEY / 2
+        player2 = Player('reyna')
+        horse2 = Horse('donkey', 0.5)
+        self.payout.addBet(player, horse, betAmount)
+        self.payout.addBet(player2, horse2, betAmount)
+        balanceAfterBet = player.money
+        self.payout.payoutPlayers(horse)
+        self.assertEqual(player.money, balanceAfterBet + (betAmount * 2))
+        self.assertEqual(player2.money, balanceAfterBet)
+
+    def testPayoutPlayersTwoBetsTwoWinners(self):
+        player = Player('jett')
+        horse = Horse('horsey', 0.5)
+        betAmount = INIT_MONEY / 2
+        player2 = Player('reyna')
+        self.payout.addBet(player, horse, betAmount)
+        self.payout.addBet(player2, horse, betAmount)
+        balanceAfterBet = player.money
+        self.payout.payoutPlayers(horse)
+        self.assertEqual(player.money, balanceAfterBet + (betAmount * 2))
+        self.assertEqual(player2.money, balanceAfterBet + (betAmount * 2))
 
 if __name__ == '__main__':
     unittest.main()

@@ -1,17 +1,14 @@
-from horse import Horse
+from leaderboard import Leaderboard
 from payout import Payout
+from race import Race
 
-class Bet:
-    NUM_HORSES = 3
+class Game:
 
-    # TODO: initialize the horses and add them to the list
-    def __init__(self):
-        self.horses = []
-        self.winner = None
+    def __init__(self, leaderboard: Leaderboard):
+        self.race = Race()
+        self.leaderboard = leaderboard
         self.payout = Payout()
 
-    # choose a winner based on probabilities and return them
-    # then call payout.payoutPlayers
-    # then call leaderboard.sortLeaderboard
+    # Start race, then payout players, then update leaderboard
     def startGame(self):
         pass
