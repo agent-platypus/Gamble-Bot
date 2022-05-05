@@ -3,6 +3,7 @@ import unittest
 from leaderboard import Leaderboard
 
 from player import Player
+import errors
 
 class TestLeaderboard(unittest.TestCase):
 
@@ -16,10 +17,10 @@ class TestLeaderboard(unittest.TestCase):
         self.leaderboard = Leaderboard(playerlist)
 
     def testSortMoney(self):
-        #sorting expected: david, ken, mau, ray, brandon
+        #sorting expected: david 95, ken 90, mau 85, ray 75, brandon 70
 
         # testing number 1 standing
-        self.assertEqual(self.leaderboard.players[0].money, 200)
+        self.assertEqual(self.leaderboard.players[0].money, Player.INIT_MONEY - 5)
     
     def testSortNames(self):
         # testing proper standing with corresponding names
@@ -33,7 +34,17 @@ class TestLeaderboard(unittest.TestCase):
         self.leaderboard.addPlayer(Player('nancy'))
         self.assertEqual(self.leaderboard.players[0].name, 'nancy')
     
+    def testSortChange(self):
+        self.leaderboard.players[0].subtractMoney(30)
+        self.leaderboard.players[1].subtractMoney(15)
+        self.leaderboard.sortLeaderboard()
+        self.assertEqual(self.leaderboard.players[0].name, 'mau')
+        self.assertEqual(self.leaderboard.players[1].name, 'ken')
 
+    def testRedundance(self):
+        self.leaderboard.addPlayer(Player('nancy'))
+        with self.assertRaises(errors.RedundantPlayerError):
+            self.leaderboard.addPlayer(Player('nancy'))
 
 if __name__ == '__main__':
     unittest.main()

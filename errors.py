@@ -15,3 +15,6 @@ class MultipleBetError(Error):
 
 class BetDoesNotExistError(Error):
     pass
+
+class RedundantPlayerError(Error):
+    pass
