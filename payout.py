@@ -20,6 +20,7 @@ class Payout:
         pass
 
     # remove given bet from bets
+    # give bet money back to player
     # if bet does not exist, raise BetDoesNotExistError
-    def removeBet(self, player: Player):
+    def removeBet(self, playerName: str):
         pass

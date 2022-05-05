@@ -1,9 +1,6 @@
 import unittest
-
-from player import INIT_MONEY, Player
-
+from player import Player
 from horse import Horse 
-
 from bet import Bet
 
 class TestBet(unittest.TestCase):
@@ -23,7 +20,7 @@ class TestBet(unittest.TestCase):
         self.assertEqual(self.bet.player, player)
         self.assertEqual(self.bet.horse, horse)
         self.assertEqual(self.bet.money, 25)
-        self.assertEqual(self.bet.player.money, INIT_MONEY - 25)
+        self.assertEqual(self.bet.player.money, Player.INIT_MONEY - 25)
 
 
     
