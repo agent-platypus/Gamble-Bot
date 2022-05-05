@@ -1,4 +1,3 @@
-from multiprocessing.pool import INIT
 import unittest
 from payout import Payout
 from player import Player
