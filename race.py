@@ -1,3 +1,4 @@
+import random
 from horse import Horse
 
 class Race:
@@ -5,8 +6,28 @@ class Race:
 
     # TODO: initialize the horses and add them to the list
     def __init__(self):
-        self.horses = [Horse]
-
+        self.horses = []
+        variance = 20
+        avgProbability = 1 / self.NUM_HORSES
+        minProbability = avgProbability - (variance * 0.01)
+        maxProbability = avgProbability + (variance * 0.01)
+        totalProbability = 1
+        for i in range(self.NUM_HORSES):
+            if (i == self.NUM_HORSES - 1):
+                horse = Horse(str(i), totalProbability)
+                self.horses.append(horse)
+            else:
+                rng = random.randrange(variance * -1, variance) * 0.01
+                winProbability = avgProbability + rng
+                flag = 0
+                while (flag == 0):
+                    if (totalProbability - winProbability >= minProbability * (self.NUM_HORSES - (i + 1))):
+                        horse = Horse(str(i), winProbability)
+                        self.horses.append(horse)
+                        totalProbability = totalProbability - winProbability
+                        flag = 1
+                    else:
+                        winProbability = winProbability - 0.01
     # choose a winner based on probabilities and return winner
     def startRace(self):
         pass

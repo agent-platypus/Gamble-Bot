@@ -13,7 +13,7 @@ class TestRace(unittest.TestCase):
         horse: Horse
         for horse in self.race.horses:
             sumProbability = sumProbability + horse.winProbability
-        self.assertEqual(sumProbability, 1)
+        self.assertAlmostEqual(sumProbability, 1)
     
     def testStartRace(self):
         winner = self.race.startRace()
