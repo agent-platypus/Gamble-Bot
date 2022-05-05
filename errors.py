@@ -3,11 +3,11 @@ class Error(Exception):
     pass
 
 
-class BetTooSmallError(Error):
+class AmountTooSmallError(Error):
     pass
 
 
-class BetTooLargeError(Error):
+class AmountTooLargeError(Error):
     pass
 
 class MultipleBetError(Error):

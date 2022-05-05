@@ -12,6 +12,11 @@ class Player:
     # And amount > 0
     # Subtracts amount from money
     def subtractMoney(self, amount: int):
-        self.money = self.money - amount 
+        self.money = self.money - amount
+
+    # if amount < 0, raise AmountTooSmallError
+    # otherwise, add amount to player's money
+    def addMoney(self, amount: int):
+        self.money = self.money + amount
 
 #hi

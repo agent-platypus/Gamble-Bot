@@ -20,8 +20,8 @@ class TestPlayer(unittest.TestCase):
         self.payout.addBet(player, horse, Player.INIT_MONEY / 2)
         self.assertTrue(len(self.payout.bets) == 1)
         bet = self.payout.bets[0]
-        self.assertEqual(bet.player, 'jett')
-        self.assertEqual(bet.horse, 'horsey')
+        self.assertEqual(bet.player.name, 'jett')
+        self.assertEqual(bet.horse.name, 'horsey')
         self.assertEqual(bet.money, Player.INIT_MONEY / 2)
     
     def testAddBetMinBet(self):
@@ -30,8 +30,8 @@ class TestPlayer(unittest.TestCase):
         self.payout.addBet(player, horse, 1)
         self.assertTrue(len(self.payout.bets) == 1)
         bet = self.payout.bets[0]
-        self.assertEqual(bet.player, 'jett')
-        self.assertEqual(bet.horse, 'horsey')
+        self.assertEqual(bet.player.name, 'jett')
+        self.assertEqual(bet.horse.name, 'horsey')
         self.assertEqual(bet.money, 1)
     
     def testAddBetMaxBet(self):
@@ -40,8 +40,8 @@ class TestPlayer(unittest.TestCase):
         self.payout.addBet(player, horse, Player.INIT_MONEY)
         self.assertTrue(len(self.payout.bets) == 1)
         bet = self.payout.bets[0]
-        self.assertEqual(bet.player, 'jett')
-        self.assertEqual(bet.horse, 'horsey')
+        self.assertEqual(bet.player.name, 'jett')
+        self.assertEqual(bet.horse.name, 'horsey')
         self.assertEqual(bet.money, Player.INIT_MONEY)
 
     def testAddBetTwoBets(self):
@@ -50,47 +50,47 @@ class TestPlayer(unittest.TestCase):
         self.payout.addBet(player, horse, Player.INIT_MONEY / 2)
         self.assertTrue(len(self.payout.bets) == 1)
         bet = self.payout.bets[0]
-        self.assertEqual(bet.player, 'jett')
-        self.assertEqual(bet.horse, 'horsey')
+        self.assertEqual(bet.player.name, 'jett')
+        self.assertEqual(bet.horse.name, 'horsey')
         self.assertEqual(bet.money, Player.INIT_MONEY / 2)
 
         player2 = Player('reyna')
         horse2 = Horse('donkey', 0.5)
-        self.payout.addBet(player, horse, Player.INIT_MONEY)
+        self.payout.addBet(player2, horse2, Player.INIT_MONEY)
         self.assertTrue(len(self.payout.bets) == 2)
-        self.assertEqual(bet.player, 'jett')
-        self.assertEqual(bet.horse, 'horsey')
+        self.assertEqual(bet.player.name, 'jett')
+        self.assertEqual(bet.horse.name, 'horsey')
         self.assertEqual(bet.money, Player.INIT_MONEY / 2)
         bet2 = self.payout.bets[1]
-        self.assertEqual(bet2.player, 'reyna')
-        self.assertEqual(bet2.horse, 'donkey')
+        self.assertEqual(bet2.player.name, 'reyna')
+        self.assertEqual(bet2.horse.name, 'donkey')
         self.assertEqual(bet2.money, Player.INIT_MONEY)
 
     def testAddBetZero(self):
         player = Player('jett')
         horse = Horse('horsey', 0.5)
-        with self.assertRaises(errors.BetTooSmallError):
+        with self.assertRaises(errors.AmountTooSmallError):
             self.payout.addBet(player, horse, 0)
         self.assertTrue(len(self.payout.bets) == 0)
 
     def testAddBetNegativeBet(self):
         player = Player('jett')
         horse = Horse('horsey', 0.5)
-        with self.assertRaises(errors.BetTooSmallError):
+        with self.assertRaises(errors.AmountTooSmallError):
             self.payout.addBet(player, horse, -1)
         self.assertTrue(len(self.payout.bets) == 0)
     
     def testAddBetTooBig(self):
         player = Player('jett')
         horse = Horse('horsey', 0.5)
-        with self.assertRaises(errors.BetTooLargeError):
+        with self.assertRaises(errors.AmountTooLargeError):
             self.payout.addBet(player, horse, Player.INIT_MONEY + 1)
         self.assertTrue(len(self.payout.bets) == 0)
     
     def testAddBetWayTooBig(self):
         player = Player('jett')
         horse = Horse('horsey', 0.5)
-        with self.assertRaises(errors.BetTooSmallError):
+        with self.assertRaises(errors.AmountTooLargeError):
             self.payout.addBet(player, horse, Player.INIT_MONEY + 5000)
         self.assertTrue(len(self.payout.bets) == 0)
     
@@ -100,8 +100,8 @@ class TestPlayer(unittest.TestCase):
         self.payout.addBet(player, horse, Player.INIT_MONEY / 2)
         self.assertTrue(len(self.payout.bets) == 1)
         bet = self.payout.bets[0]
-        self.assertEqual(bet.player, 'jett')
-        self.assertEqual(bet.horse, 'horsey')
+        self.assertEqual(bet.player.name, 'jett')
+        self.assertEqual(bet.horse.name, 'horsey')
         self.assertEqual(bet.money, Player.INIT_MONEY / 2)
 
         with self.assertRaises(errors.MultipleBetError):
@@ -167,8 +167,8 @@ class TestPlayer(unittest.TestCase):
         self.payout.addBet(player, horse, Player.INIT_MONEY / 2)
         self.assertTrue(len(self.payout.bets) == 1)
         bet = self.payout.bets[0]
-        self.assertEqual(bet.player, 'jett')
-        self.assertEqual(bet.horse, 'horsey')
+        self.assertEqual(bet.player.name, 'jett')
+        self.assertEqual(bet.horse.name, 'horsey')
         self.assertEqual(bet.money, Player.INIT_MONEY / 2)
         self.payout.removeBet('jett')
         self.assertEqual(len(self.payout.bets), 0)
@@ -179,10 +179,9 @@ class TestPlayer(unittest.TestCase):
         self.payout.addBet(player, horse, Player.INIT_MONEY / 2)
         self.assertTrue(len(self.payout.bets) == 1)
         bet = self.payout.bets[0]
-        self.assertEqual(bet.player, 'jett')
-        self.assertEqual(bet.horse, 'horsey')
+        self.assertEqual(bet.player.name, 'jett')
+        self.assertEqual(bet.horse.name, 'horsey')
         self.assertEqual(bet.money, Player.INIT_MONEY / 2)
-        self.payout.removeBet('reyna')
         with self.assertRaises(errors.BetDoesNotExistError):
             self.payout.removeBet('reyna')
         self.assertEqual(len(self.payout.bets), 1)

@@ -14,4 +14,6 @@ class Bet:
     # then set fields to the given parameters
     # return self
     def makeBet(self, player: Player, horse: Horse, amount: int):
-        return None
+        self.player = player
+        self.money = amount
+        self.horse = horse
