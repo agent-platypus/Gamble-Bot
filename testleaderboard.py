@@ -2,7 +2,7 @@ from re import X
 import unittest
 from leaderboard import Leaderboard
 
-from player import INIT_MONEY, Player
+from player import Player
 
 class TestLeaderboard(unittest.TestCase):
 
