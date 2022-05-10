@@ -22,9 +22,9 @@ class TestRace(unittest.TestCase):
     def testRiggedRace(self):
         self.race.horses[0].winProbability = 1
         for i in range(1, len(self.race.horses) - 1):
-            self.race.horses[i] = 0
+            self.race.horses[i].winProbability = 0
         winner = self.race.startRace()
-        self.assertIs(winner, self.race.horses[0])
+        self.assertEqual(winner.name, self.race.horses[0].name)
 
 
 if __name__ == '__main__':

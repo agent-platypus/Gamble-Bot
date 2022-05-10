@@ -1,28 +1,37 @@
 from bet import Bet
-from errors import AmountTooLargeError, AmountTooSmallError, BetDoesNotExistError, MultipleBetError
+from errors import AmountTooLargeError, AmountTooSmallError, BetDoesNotExistError, HorseMissingError, MultipleBetError
 from horse import Horse
 from player import Player
+from race import Race
 
 
 class Payout:
-    def __init__(self):
+    def __init__(self, race: Race):
         self.bets = []
+        self.race = race
 
     # call Bet.makeBet and use the bet returned to add it to bets
     # if amount <= 0 raise BetTooSmallError
     # if amount > player.money raise BetTooLargeError
-    # if player has already made a bet, raise MultipleBetError 
+    # if player has already made a bet, raise MultipleBetError
+    # TODO: account for when the horse does exist 
     def addBet(self, player: Player, horse: Horse, amount: int):
         if (amount <= 0):
             raise AmountTooSmallError()
         if (amount > player.money):
             raise AmountTooLargeError()
+        raceHorse: Horse
+        flag = 0
+        for raceHorse in self.race.horses:
+            if raceHorse.name == horse.name:
+                flag = 1
+        if flag == 0:
+            raise HorseMissingError()
         bet: Bet
         for bet in self.bets:
             if bet.player.name == player.name:
                 raise MultipleBetError()
-        newBet = Bet()
-        newBet.makeBet(player, horse, amount)
+        newBet = Bet(player, horse, amount)
         self.bets.append(newBet)
 
     # pay out every player that bet on the winner

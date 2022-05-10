@@ -17,11 +17,12 @@ class Leaderboard:
             if x.name == pushinp.name:
                 raise errors.RedundantPlayerError()        
         #self.players.append(pushinp)
-        for i in range (len(self.players)-1):
+        for i in range (len(self.players)):
             # checking player money, from greatest to least
             if pushinp.money >= self.players[i].money:
                 self.players.insert(i,pushinp)
                 break
+        self.players.append(pushinp)
             
 
 

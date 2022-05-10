@@ -34,6 +34,12 @@ class TestLeaderboard(unittest.TestCase):
         self.leaderboard.addPlayer(Player('nancy'))
         self.assertEqual(self.leaderboard.players[0].name, 'nancy')
     
+    def testAddPlayerEnd(self):
+        nancy = Player('nancy')
+        nancy.money = 0
+        self.leaderboard.addPlayer(nancy)
+        self.assertEqual(self.leaderboard.players[len(self.leaderboard.players) - 1].name, 'nancy')
+    
     def testSortChange(self):
         self.leaderboard.players[0].subtractMoney(30)
         self.leaderboard.players[1].subtractMoney(15)

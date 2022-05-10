@@ -18,3 +18,6 @@ class BetDoesNotExistError(Error):
 
 class RedundantPlayerError(Error):
     pass
+
+class HorseMissingError(Error):
+    pass

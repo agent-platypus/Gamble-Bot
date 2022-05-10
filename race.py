@@ -29,5 +29,8 @@ class Race:
                     else:
                         winProbability = winProbability - 0.01
     # choose a winner based on probabilities and return winner
-    def startRace(self):
-        pass
+    def startRace(self) -> Horse:
+        weights = []
+        for horse in self.horses:
+            weights.append(horse.winProbability)
+        return random.choices(self.horses, weights)[0]
