@@ -1,4 +1,5 @@
 import os
+import helpers
 #deez
 import discord
 from dotenv import load_dotenv
@@ -12,42 +13,52 @@ load_dotenv('token.env')
 TOKEN = os.getenv('DISCORD_TOKEN')
 intents = discord.Intents.default()
 intents.members = True
-bot = commands.Bot(command_prefix='$', intents = intents)
+discBot = commands.Bot(command_prefix='$', intents = intents)
 leaderboard = None
 payout = None
 race = None
 
-@bot.event
+@discBot.event
 async def on_ready():
-    print(f'{bot.user} has connected to Discord!')
-    guild = discord.utils.get(bot.guilds, name='testserver')
+    global leaderboard
+    print(f'{discBot.user} has connected to Discord!')
+    guild = discord.utils.get(discBot.guilds, name='testserver')
     members = guild.members
     players = []
     for member in members:
-        if (member.display_name == bot.user.display_name):
+        if (member.display_name == discBot.user.display_name):
             pass
         else:
             player = Player(member.display_name)
             players.append(player)
-    bot.leaderboard = Leaderboard(players)
-    for leaderboardPlayer in bot.leaderboard.players:
+    leaderboard = Leaderboard(players)
+    for leaderboardPlayer in leaderboard.players:
         print(leaderboardPlayer.name)
 
-@bot.command(name='openbets', help='registers the calling user to the gambling game')
+@discBot.command(name='openbets', help='opens up a new race to bet on (admin only)')
 async def openBets(ctx):
-    roles = ctx.author.roles
-    flag = 0
-    message = ''
-    for role in roles:
-        if (role.name == 'admin'):
-            flag = 1
-    if flag == 1:
-        bot.race = Race()
-        bot.payout = Payout(race)
-        message = 'Bets are now open'
+    global payout
+    global race
+    if (not(payout is None) or not(race is None)):
+        message = 'There is already a game in place, if you would like to start a new game, please finish the existing one first'
     else:
-        message = 'You are not permitted to use this command'
+        roles = ctx.author.roles
+        flag = 0
+        message = ''
+        for role in roles:
+            if (role.name == 'admin'):
+                flag = 1
+        if flag == 1:
+            race = Race()
+            payout = Payout(race)
+            message = helpers.generateOpenBetsMessage(race)
+        else:
+            message = 'You are not permitted to use this command'
     await ctx.send(message)
 
-bot.run(TOKEN)
+@discBot.command(name = 'bet', help = 'add a bet by calling this command followed by the horse name you want to bet on, and the amount you want to bet')
+async def bet(ctx):
+    pass
+
+discBot.run(TOKEN)
 
