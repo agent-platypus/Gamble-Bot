@@ -29,7 +29,7 @@ async def on_ready():
         if (member.display_name == discBot.user.display_name):
             pass
         else:
-            player = Player(member.display_name)
+            player = Player(member.display_name, member.id)
             players.append(player)
     leaderboard = Leaderboard(players)
     for leaderboardPlayer in leaderboard.players:
@@ -60,5 +60,13 @@ async def openBets(ctx):
 async def bet(ctx):
     pass
 
+@discBot.command(name = 'rank', help = 'see your rank on the leaderboard')
+async def rank(ctx):
+    global leaderboard
+    message = ''
+    for i in range (len(leaderboard.players)):
+        if ctx.author.id == leaderboard.players[i].id:
+            message = 'You are currently rank ' + str(i + 1) + ' with a balance of ' + str(leaderboard.players[i].money)
+    await ctx.send(message)
 discBot.run(TOKEN)
 

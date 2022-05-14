@@ -4,8 +4,9 @@ from horse import Horse
 class Player:
     INIT_MONEY = 100
 
-    def __init__(self, name: str):
+    def __init__(self, name: str, id = 0):
         self.name = name
+        self.id = id 
         self.money = Player.INIT_MONEY
     
     # Assume amount <= self.money
