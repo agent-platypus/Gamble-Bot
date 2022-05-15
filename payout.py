@@ -44,9 +44,9 @@ class Payout:
         for bet in self.bets:
             if bet.horse.name == winner.name:
                 payoutMultiplier = (1 - winner.winProbability) / winner.winProbability
-                winnings = bet.money * payoutMultiplier
+                winnings = round(bet.money * payoutMultiplier)
                 winners.append([bet.player, winnings])
-                bet.player.addMoney(bet.money + (bet.money * payoutMultiplier))
+                bet.player.addMoney(round(bet.money + (bet.money * payoutMultiplier)))
         return winners
 
     # remove given bet from bets

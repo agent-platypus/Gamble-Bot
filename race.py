@@ -13,8 +13,9 @@ class Race:
         maxProbability = avgProbability + (variance * 0.01)
         totalProbability = 1
         for i in range(self.NUM_HORSES):
+            name = self.chooseName()
             if (i == self.NUM_HORSES - 1):
-                horse = Horse(str(i), totalProbability)
+                horse = Horse(name, totalProbability)
                 self.horses.append(horse)
             else:
                 rng = random.randrange(variance * -1, variance) * 0.01
@@ -22,7 +23,7 @@ class Race:
                 flag = 0
                 while (flag == 0):
                     if (totalProbability - winProbability >= minProbability * (self.NUM_HORSES - (i + 1))):
-                        horse = Horse(str(i), winProbability)
+                        horse = Horse(name, winProbability)
                         self.horses.append(horse)
                         totalProbability = totalProbability - winProbability
                         flag = 1
@@ -34,3 +35,9 @@ class Race:
         for horse in self.horses:
             weights.append(horse.winProbability)
         return random.choices(self.horses, weights)[0]
+    
+    def chooseName(self) -> str:
+        f = open('horse names.txt')
+        names = f.read()
+        names = names.split()
+        return random.choice(names)

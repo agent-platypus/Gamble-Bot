@@ -10,6 +10,7 @@ from leaderboard import Leaderboard
 from payout import Payout
 from player import Player
 from race import Race
+import pickle
 
 load_dotenv('token.env')
 TOKEN = os.getenv('DISCORD_TOKEN')
@@ -25,17 +26,21 @@ guild = None
 async def on_ready():
     global leaderboard
     global guild
-    print(f'{discBot.user} has connected to Discord!')
     guild = discord.utils.get(discBot.guilds, name='testserver')
-    members = guild.members
-    players = []
-    for member in members:
-        if (member.display_name == discBot.user.display_name):
-            pass
-        else:
-            player = Player(member.display_name, member.id)
-            players.append(player)
-    leaderboard = Leaderboard(players)
+    print(f'{discBot.user} has connected to Discord!')
+    try:
+        leaderboard = pickle.load(open("leaderboard.pickle", "rb"))
+    except (OSError, IOError) as e:
+        members = guild.members
+        players = []
+        for member in members:
+            if (member.display_name == discBot.user.display_name):
+                pass
+            else:
+                player = Player(member.display_name, member.id)
+                players.append(player)
+        leaderboard = Leaderboard(players)
+        pickle.dump(leaderboard, open("leaderboard.pickle", "wb"))
     for leaderboardPlayer in leaderboard.players:
         print(leaderboardPlayer.name)
 
@@ -114,7 +119,10 @@ async def startRace(ctx):
     winner = race.startRace()
     winners = payout.payoutPlayers(winner)
     leaderboard.sortLeaderboard()
+    pickle.dump(leaderboard, open("leaderboard.pickle", "wb"))
     message = helpers.generateStartRaceMesage(winner, winners, guild)
+    payout = None
+    race = None
     await ctx.send(message)
                     
 discBot.run(TOKEN)
