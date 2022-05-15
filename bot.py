@@ -1,4 +1,6 @@
+
 import os
+from errors import AmountTooLargeError, AmountTooSmallError, HorseMissingError, MultipleBetError
 import helpers
 #deez
 import discord
@@ -17,10 +19,12 @@ discBot = commands.Bot(command_prefix='$', intents = intents)
 leaderboard = None
 payout = None
 race = None
+guild = None
 
 @discBot.event
 async def on_ready():
     global leaderboard
+    global guild
     print(f'{discBot.user} has connected to Discord!')
     guild = discord.utils.get(discBot.guilds, name='testserver')
     members = guild.members
@@ -51,14 +55,11 @@ async def openBets(ctx):
         if flag == 1:
             race = Race()
             payout = Payout(race)
-            message = helpers.generateOpenBetsMessage(race)
+            role = guild.get_role(975192638594625577)
+            message = role.mention + ' ' + helpers.generateOpenBetsMessage(race)
         else:
             message = 'You are not permitted to use this command'
     await ctx.send(message)
-
-@discBot.command(name = 'bet', help = 'add a bet by calling this command followed by the horse name you want to bet on, and the amount you want to bet')
-async def bet(ctx):
-    pass
 
 @discBot.command(name = 'rank', help = 'see your rank on the leaderboard')
 async def rank(ctx):
@@ -68,5 +69,53 @@ async def rank(ctx):
         if ctx.author.id == leaderboard.players[i].id:
             message = 'You are currently rank ' + str(i + 1) + ' with a balance of ' + str(leaderboard.players[i].money)
     await ctx.send(message)
+
+@discBot.command(name = 'leaderboard', help = 'show leaderboard')
+async def leaderboard(ctx):
+    global leaderboard
+    message = helpers.generateLeaderboardMessage(leaderboard)
+    await ctx.send(message)
+
+@discBot.command(name = 'bet', help = 'bet an amount on a horse, should be formatted like Ex. bet horsey 100')
+async def bet(ctx):
+    global payout
+    global leaderboard
+    if (payout is None):
+        message = 'There is currently no race available to bet on, please open bets first'
+    else:
+        args = ctx.message.content.split()
+        if len(args) != 3:
+            await ctx.send('Error: invalid number of arguments')
+            return
+        horse = args[1]
+        amount = args[2]
+        playerID = ctx.author.id
+        for player in leaderboard.players:
+            if playerID == player.id:
+                try:
+                    payout.addBet(player, horse, int(amount))
+                    message = 'Your bet was successfully added'
+                except AmountTooSmallError:
+                    message = 'Error: your bet is zero or negative'
+                except AmountTooLargeError:
+                    message = 'Error: your bet is too large'
+                except HorseMissingError:
+                    message = 'Error: this horse does not exist'
+                except MultipleBetError:
+                    message = 'Error: you have already placed a bet. If you would like to remove your bet, use $removebet'
+                break
+    await ctx.send(message)
+
+@discBot.command(name = 'startrace', help = 'start the race (admin only)')
+async def startRace(ctx):
+    global payout
+    global race
+    global leaderboard
+    winner = race.startRace()
+    winners = payout.payoutPlayers(winner)
+    leaderboard.sortLeaderboard()
+    message = helpers.generateStartRaceMesage(winner, winners, guild)
+    await ctx.send(message)
+                    
 discBot.run(TOKEN)
 
