@@ -21,6 +21,8 @@ leaderboard = None
 payout = None
 race = None
 guild = None
+adminRole = 975578359675371570
+playerRole = 975579359660347472
 
 @discBot.event
 async def on_ready():
@@ -28,7 +30,7 @@ async def on_ready():
     global guild
     global payout
     global race
-    guild = discord.utils.get(discBot.guilds, name='testserver')
+    guild = discord.utils.get(discBot.guilds, id=612511489869217805)
     print(f'{discBot.user} has connected to Discord!')
     try:
         leaderboard = pickle.load(open("leaderboard.pickle", "rb"))
@@ -36,10 +38,15 @@ async def on_ready():
         members = guild.members
         players = []
         for member in members:
-            if (member.display_name == discBot.user.display_name):
+            roles = member.roles
+            flag = 0
+            for role in roles:
+                if (role.id == 612676399886630924):
+                    flag = 1
+            if flag == 1:
                 pass
             else:
-                player = Player(member.display_name, member.id)
+                player = Player(member.name, member.id)
                 players.append(player)
         leaderboard = Leaderboard(players)
         pickle.dump(leaderboard, open("leaderboard.pickle", "wb"))
@@ -53,13 +60,15 @@ async def on_ready():
 
 #@discBot.event
 #async def on_member_join(member):
- #   player = Player(member.display_name, member.id)
+ #   player = Player(member.name, member.id)
   #  leaderboard.addPlayer(player)
 
 @discBot.command(name='openbets', help='opens up a new race to bet on (admin only)')
 async def openBets(ctx):
     global payout
     global race
+    global adminRole
+    global playerRole
     if (not(payout is None) or not(race is None)):
         message = 'There is already a game in place, if you would like to start a new game, please finish the existing one first'
     else:
@@ -67,15 +76,14 @@ async def openBets(ctx):
         flag = 0
         message = ''
         for role in roles:
-            if (role.name == 'admin'):
+            if (role.id == adminRole):
                 flag = 1
         if flag == 1:
             race = Race()
             payout = Payout(race)
             pickle.dump(race, open('race.pickle', 'wb'))
             pickle.dump(payout, open('payout.pickle', 'wb'))
-            role = guild.get_role(975192638594625577)
-            message = role.mention + ' ' + helpers.generateOpenBetsMessage(race)
+            message = guild.get_role(playerRole).mention + ' ' + helpers.generateOpenBetsMessage(race)
         else:
             message = 'You are not permitted to use this command'
     await ctx.send(message)
@@ -131,6 +139,7 @@ async def startRace(ctx):
     global payout
     global race
     global leaderboard
+    global adminRole
     if (payout is None):
         message = 'There is currently no race, please open bets first'
     else:
@@ -138,7 +147,7 @@ async def startRace(ctx):
         flag = 0
         message = ''
         for role in roles:
-            if (role.name == 'admin'):
+            if (role.id == adminRole):
                 flag = 1
         if flag == 1:
             winner = race.startRace()
@@ -157,17 +166,18 @@ async def startRace(ctx):
 @discBot.command(name = 'allowance', help = 'give all players their allowance (admin only)')
 async def allowance(ctx):
     global leaderboard
+    global adminRole
     allowance = 100
     roles = ctx.author.roles
     flag = 0
     message = ''
     for role in roles:
-        if (role.name == 'admin'):
+        if (role.id == adminRole):
             flag = 1
     if flag == 1:
         for player in leaderboard.players:
-            player.addMoney(allowance)
-        message = 'Allowance of ' + str(allowance) +  ' has been given to all players'
+            player.addMoney(allowance + (0.1 * player.money))
+        message = 'Allowance of ' + str(allowance) + ' + 10 precent interest has been given to all players'
     else:
         message = 'You are not permitted to use this command'
     await ctx.send(message)
@@ -175,11 +185,12 @@ async def allowance(ctx):
 @discBot.command(name = 'addplayer', help = 'add a player to the leaderboard (admin only)')
 async def addPlayer(ctx):
     global leaderboard
+    global adminRole
     roles = ctx.author.roles
     flag = 0
     message = ''
     for role in roles:
-        if (role.name == 'admin'):
+        if (role.id == adminRole):
             flag = 1
     if flag == 1:
         args = ctx.message.content.split()
@@ -188,8 +199,8 @@ async def addPlayer(ctx):
             return
         name = args[1]
         for member in guild.members:
-            if (name == member.display_name):
-                player = Player(member.display_name, member.id)
+            if (name == member.name):
+                player = Player(member.name, member.id)
                 leaderboard.addPlayer(player)
                 pickle.dump(leaderboard, open('leaderboard.pickle', 'wb'))
                 message = name + ' has been added to the leaderboard'
