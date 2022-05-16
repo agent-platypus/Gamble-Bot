@@ -21,7 +21,7 @@ class Leaderboard:
             # checking player money, from greatest to least
             if pushinp.money >= self.players[i].money:
                 self.players.insert(i,pushinp)
-                break
+                return
         self.players.append(pushinp)
             
 

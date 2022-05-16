@@ -26,6 +26,8 @@ guild = None
 async def on_ready():
     global leaderboard
     global guild
+    global payout
+    global race
     guild = discord.utils.get(discBot.guilds, name='testserver')
     print(f'{discBot.user} has connected to Discord!')
     try:
@@ -41,8 +43,18 @@ async def on_ready():
                 players.append(player)
         leaderboard = Leaderboard(players)
         pickle.dump(leaderboard, open("leaderboard.pickle", "wb"))
+    try:
+        payout = pickle.load(open('payout.pickle', 'rb'))
+        race = pickle.load(open('race.pickle', 'rb'))
+    except:
+        pass
     for leaderboardPlayer in leaderboard.players:
         print(leaderboardPlayer.name)
+
+#@discBot.event
+#async def on_member_join(member):
+ #   player = Player(member.display_name, member.id)
+  #  leaderboard.addPlayer(player)
 
 @discBot.command(name='openbets', help='opens up a new race to bet on (admin only)')
 async def openBets(ctx):
@@ -60,6 +72,8 @@ async def openBets(ctx):
         if flag == 1:
             race = Race()
             payout = Payout(race)
+            pickle.dump(race, open('race.pickle', 'wb'))
+            pickle.dump(payout, open('payout.pickle', 'wb'))
             role = guild.get_role(975192638594625577)
             message = role.mention + ' ' + helpers.generateOpenBetsMessage(race)
         else:
@@ -99,6 +113,7 @@ async def bet(ctx):
             if playerID == player.id:
                 try:
                     payout.addBet(player, horse, int(amount))
+                    pickle.dump(payout, open('payout.pickle', 'wb'))
                     message = 'Your bet was successfully added'
                 except AmountTooSmallError:
                     message = 'Error: your bet is zero or negative'
@@ -116,13 +131,70 @@ async def startRace(ctx):
     global payout
     global race
     global leaderboard
-    winner = race.startRace()
-    winners = payout.payoutPlayers(winner)
-    leaderboard.sortLeaderboard()
-    pickle.dump(leaderboard, open("leaderboard.pickle", "wb"))
-    message = helpers.generateStartRaceMesage(winner, winners, guild)
-    payout = None
-    race = None
+    if (payout is None):
+        message = 'There is currently no race, please open bets first'
+    else:
+        roles = ctx.author.roles
+        flag = 0
+        message = ''
+        for role in roles:
+            if (role.name == 'admin'):
+                flag = 1
+        if flag == 1:
+            winner = race.startRace()
+            winners = payout.payoutPlayers(winner)
+            leaderboard.sortLeaderboard()
+            pickle.dump(leaderboard, open("leaderboard.pickle", "wb"))
+            message = helpers.generateStartRaceMesage(winner, winners, guild)
+            payout = None
+            race = None
+            pickle.dump(payout, open('payout.pickle', 'wb'))
+            pickle.dump(race, open('race.pickle', 'wb'))
+        else:
+            message = 'You are not permitted to use this command'
+    await ctx.send(message)
+
+@discBot.command(name = 'allowance', help = 'give all players their allowance (admin only)')
+async def allowance(ctx):
+    global leaderboard
+    allowance = 100
+    roles = ctx.author.roles
+    flag = 0
+    message = ''
+    for role in roles:
+        if (role.name == 'admin'):
+            flag = 1
+    if flag == 1:
+        for player in leaderboard.players:
+            player.addMoney(allowance)
+        message = 'Allowance of ' + str(allowance) +  ' has been given to all players'
+    else:
+        message = 'You are not permitted to use this command'
+    await ctx.send(message)
+
+@discBot.command(name = 'addplayer', help = 'add a player to the leaderboard (admin only)')
+async def addPlayer(ctx):
+    global leaderboard
+    roles = ctx.author.roles
+    flag = 0
+    message = ''
+    for role in roles:
+        if (role.name == 'admin'):
+            flag = 1
+    if flag == 1:
+        args = ctx.message.content.split()
+        if len(args) != 2:
+            await ctx.send('Error: invalid number of arguments')
+            return
+        name = args[1]
+        for member in guild.members:
+            if (name == member.display_name):
+                player = Player(member.display_name, member.id)
+                leaderboard.addPlayer(player)
+                message = name + ' has been added to the leaderboard'
+                break
+    else:
+        message = 'You are not permitted to use this command'
     await ctx.send(message)
                     
 discBot.run(TOKEN)
