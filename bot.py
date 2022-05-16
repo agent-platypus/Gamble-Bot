@@ -191,6 +191,7 @@ async def addPlayer(ctx):
             if (name == member.display_name):
                 player = Player(member.display_name, member.id)
                 leaderboard.addPlayer(player)
+                pickle.dump(leaderboard, open('leaderboard.pickle', 'wb'))
                 message = name + ' has been added to the leaderboard'
                 break
     else:
