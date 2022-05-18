@@ -1,6 +1,6 @@
 
 import os
-from errors import AmountTooLargeError, AmountTooSmallError, HorseMissingError, MultipleBetError
+from errors import AmountTooLargeError, AmountTooSmallError, BetDoesNotExistError, HorseMissingError, MultipleBetError
 import helpers
 #deez
 import discord
@@ -83,7 +83,7 @@ async def openBets(ctx):
             payout = Payout(race)
             pickle.dump(race, open('race.pickle', 'wb'))
             pickle.dump(payout, open('payout.pickle', 'wb'))
-            message = guild.get_role(playerRole).mention + ' ' + helpers.generateOpenBetsMessage(race)
+            message = guild.get_role(playerRole).mention + ' Bets are now open, you may bet on the following horses:' + helpers.generateOpenBetsMessage(race)
         else:
             message = 'You are not permitted to use this command'
     await ctx.send(message)
@@ -114,14 +114,15 @@ async def bet(ctx):
         if len(args) != 3:
             await ctx.send('Error: invalid number of arguments')
             return
-        horse = args[1]
+        horse: str = args[1]
         amount = args[2]
         playerID = ctx.author.id
         for player in leaderboard.players:
             if playerID == player.id:
                 try:
-                    payout.addBet(player, horse, int(amount))
+                    payout.addBet(player, horse.capitalize(), int(amount))
                     pickle.dump(payout, open('payout.pickle', 'wb'))
+                    pickle.dump(leaderboard, open('leaderboard.pickle', 'wb'))
                     message = 'Your bet was successfully added'
                 except AmountTooSmallError:
                     message = 'Error: your bet is zero or negative'
@@ -176,7 +177,7 @@ async def allowance(ctx):
             flag = 1
     if flag == 1:
         for player in leaderboard.players:
-            player.addMoney(allowance + (0.1 * player.money))
+            player.addMoney(allowance + round(0.1 * player.money))
         message = 'Allowance of ' + str(allowance) + ' + 10 precent interest has been given to all players'
     else:
         message = 'You are not permitted to use this command'
@@ -208,6 +209,57 @@ async def addPlayer(ctx):
     else:
         message = 'You are not permitted to use this command'
     await ctx.send(message)
+
+@discBot.command(name = 'removebet', help = 'remove your bet from the pool')
+async def removeBet(ctx):
+    global payout
+    global leaderboard
+    try:
+        payout.removeBet(ctx.author.name)
+        pickle.dump(leaderboard, open('leaderboard.pickle', 'wb'))
+        pickle.dump(payout, open('payout.pickle', 'wb'))
+        message = 'Your bet has been successfully removed'
+    except BetDoesNotExistError:
+        message = 'Error: You have not placed a bet yet, cannot remove'
+    await ctx.send(message)
+
+@discBot.command(name = 'horses', help = 'show all horses currently in the race')
+async def horses(ctx):
+    global race
+    if (race is None):
+        message = 'There is currently no race right now'
+    else:
+        message = helpers.generateOpenBetsMessage(race)
+    await ctx.send(message)
+
+@discBot.command(name = 'removeplayer', help = 'add a player to the leaderboard (admin only)')
+async def removePlayer(ctx):
+    global leaderboard
+    global adminRole
+    roles = ctx.author.roles
+    flag = 0
+    message = ''
+    for role in roles:
+        if (role.id == adminRole):
+            flag = 1
+    if flag == 1:
+        args = ctx.message.content.split()
+        if len(args) != 2:
+            await ctx.send('Error: invalid number of arguments')
+            return
+        name = args[1]
+        try:
+            leaderboard.removePlayer(name)
+            message = 'Player has been successfully removed'
+            pickle.dump(leaderboard, open('leaderboard.pickle', 'wb'))
+        except:
+            message = 'Error: player does not exist'
+    else:
+        message = 'You are not permitted to use this command'
+    await ctx.send(message)
+
+
+
                     
 discBot.run(TOKEN)
 

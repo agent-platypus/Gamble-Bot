@@ -6,7 +6,7 @@ from tabulate import tabulate
 import discord
 
 def generateOpenBetsMessage(race: Race) -> str:
-    message = 'Bets are now open, you may bet on the following horses:'
+    message = ''
     for horse in race.horses:
         odds = (1 - horse.winProbability) / horse.winProbability
         odds = round(odds, 2)

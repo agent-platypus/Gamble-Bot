@@ -21,3 +21,6 @@ class RedundantPlayerError(Error):
 
 class HorseMissingError(Error):
     pass
+
+class PlayerDoesNotExistError(Error):
+    pass

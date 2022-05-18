@@ -1,3 +1,4 @@
+import string
 from player import Player
 import errors
 
@@ -23,9 +24,13 @@ class Leaderboard:
                 self.players.insert(i,pushinp)
                 return
         self.players.append(pushinp)
-            
-
-
+    
+    def removePlayer(self, name: string):
+        for player in self.players:
+            if (name == player.name):
+                self.players.remove(player)
+                return
+        raise errors.PlayerDoesNotExistError()        
         
     
     #deez
