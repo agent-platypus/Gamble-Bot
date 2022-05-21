@@ -17,8 +17,12 @@ def generateOpenBetsMessage(race: Race) -> str:
 def generateLeaderboardMessage(leaderboard: Leaderboard) -> str:
     array = []
     for i in range(len(leaderboard.players)):
-        array.append([i + 1, leaderboard.players[i].name, leaderboard.players[i].money])
-    message = '```' + tabulate(array, headers=['rank', 'name', 'money']) + '```'
+        if leaderboard.players[i].games == 0:
+            winPercentage = '0%'
+        else:
+            winPercentage = str(round((leaderboard.players[i].wins / leaderboard.players[i].games) * 100)) + '%'
+        array.append([i + 1, leaderboard.players[i].name, leaderboard.players[i].money, winPercentage])
+    message = '```' + tabulate(array, headers=['rank', 'name', 'money', 'win rate']) + '```'
     return message
 
 def generateStartRaceMesage(winner: Horse, winners: list, guild: discord.Guild) -> str:

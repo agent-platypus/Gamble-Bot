@@ -8,6 +8,8 @@ class Player:
         self.name = name
         self.id = id 
         self.money = Player.INIT_MONEY
+        self.wins = 0
+        self.games = 0
     
     # Assume amount <= self.money
     # And amount > 0
@@ -19,5 +21,8 @@ class Player:
     # otherwise, add amount to player's money
     def addMoney(self, amount: int):
         self.money = self.money + amount
+    
+    def setMoney(self, amount: int):
+        self.money = amount
 
 #hi

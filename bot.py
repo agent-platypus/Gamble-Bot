@@ -1,6 +1,6 @@
 
 import os
-from errors import AmountTooLargeError, AmountTooSmallError, BetDoesNotExistError, HorseMissingError, MultipleBetError
+from errors import AmountTooLargeError, AmountTooSmallError, BetDoesNotExistError, HorseMissingError, MultipleBetError, PlayerDoesNotExistError
 import helpers
 #deez
 import discord
@@ -41,13 +41,13 @@ async def on_ready():
             roles = member.roles
             flag = 0
             for role in roles:
-                if (role.id == 612676399886630924):
+                if (role.id == 975579359660347472):
                     flag = 1
             if flag == 1:
-                pass
-            else:
                 player = Player(member.name, member.id)
                 players.append(player)
+            else:
+                pass
         leaderboard = Leaderboard(players)
         pickle.dump(leaderboard, open("leaderboard.pickle", "wb"))
     try:
@@ -121,6 +121,7 @@ async def bet(ctx):
             if playerID == player.id:
                 try:
                     payout.addBet(player, horse.capitalize(), int(amount))
+                    leaderboard.sortLeaderboard()
                     pickle.dump(payout, open('payout.pickle', 'wb'))
                     pickle.dump(leaderboard, open('leaderboard.pickle', 'wb'))
                     message = 'Your bet was successfully added'
@@ -178,7 +179,7 @@ async def allowance(ctx):
     if flag == 1:
         for player in leaderboard.players:
             player.addMoney(allowance + round(0.1 * player.money))
-        message = 'Allowance of ' + str(allowance) + ' + 10 precent interest has been given to all players'
+        message = 'Allowance of ' + str(allowance) + ' + 10 percent interest has been given to all players'
     else:
         message = 'You are not permitted to use this command'
     await ctx.send(message)
@@ -258,8 +259,71 @@ async def removePlayer(ctx):
         message = 'You are not permitted to use this command'
     await ctx.send(message)
 
+@discBot.command(name = 'setmoney', help = 'set a players money (admin only)')
+async def setMoney(ctx):
+    global leaderboard
+    global adminRole
+    roles = ctx.author.roles
+    flag = 0
+    message = ''
+    for role in roles:
+        if (role.id == adminRole):
+            flag = 1
+    if flag == 1:
+        args = ctx.message.content.split()
+        if len(args) != 3:
+            await ctx.send('Error: invalid number of arguments')
+            return
+        name = args[1]
+        amount = int(args[2])
+        try:
+            player = leaderboard.findPlayer(name)
+            player.setMoney(amount)
+            leaderboard.sortLeaderboard()
+            message = name + " money set to " + str(amount)
+            pickle.dump(leaderboard, open('leaderboard.pickle', 'wb'))
+        except PlayerDoesNotExistError:
+            message = 'Error: player does not exist'
+    else:
+        message = 'You are not permitted to use this command'
+    await ctx.send(message)
 
+@discBot.command(name = 'savebackup', help = 'save a backup of the leaderboard (admin only)')
+async def saveBackup(ctx):
+    global leaderboard
+    global adminRole
+    roles = ctx.author.roles
+    flag = 0
+    message = ''
+    for role in roles:
+        if (role.id == adminRole):
+            flag = 1
+    if flag == 1:
+        pickle.dump(leaderboard, open('backup.pickle', 'wb'))
+        message = 'Backup has been saved'
+    else:
+        message = 'You are not permitted to use this command'
+    await ctx.send(message)
 
+@discBot.command(name = 'loadbackup', help = 'load existing backup (admin only)')
+async def loadBackup(ctx):
+    global leaderboard
+    global adminRole
+    roles = ctx.author.roles
+    flag = 0
+    message = ''
+    for role in roles:
+        if (role.id == adminRole):
+            flag = 1
+    if flag == 1:
+        try:
+            leaderboard = pickle.load(open('backup.pickle', 'rb'))
+            message = 'Backup has been loaded'
+        except (OSError, IOError) as e:
+            message = 'No backup saved currently'    
+    else:
+        message = 'You are not permitted to use this command'
+    await ctx.send(message)
                     
 discBot.run(TOKEN)
 

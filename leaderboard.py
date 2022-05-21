@@ -30,7 +30,12 @@ class Leaderboard:
             if (name == player.name):
                 self.players.remove(player)
                 return
-        raise errors.PlayerDoesNotExistError()        
+        raise errors.PlayerDoesNotExistError()
+
+    def findPlayer(self, name: string):
+        for player in self.players:
+            if(name == player.name):
+                return player        
         
     
     #deez
